@@ -27,9 +27,34 @@ Danach http://localhost:4321 öffnen. Mit `npm run build` entsteht die fertige S
 | `src/components/` | Header, Footer, Seitenkopf, YouTube-Einbettung (Zwei-Klick), Platzhalter |
 | `src/styles/global.css` | Designsystem: Farben, Schriften, Buttons, Abstände |
 | `src/i18n/ui.ts` | URLs je Sprache, Navigation, Texte, Kontaktdaten, Bankverbindung |
+| `src/content/blog/de/` | Blogbeiträge als Markdown, Bilder im gleichnamigen Ordner daneben (englische Beiträge unter `en/`) |
 | `src/content/team-kenya/index.md` | Abschnitt des kenianischen Teams auf der Team-Seite – pflegt das Team in Nairobi selbst |
 | `src/assets/` | Bilder und Team-Porträts, die Astro beim Build optimiert (WebP, mehrere Größen) |
+| `scripts/import-wordpress.mjs` | Einmaliger Import der Beiträge von der alten WordPress-Seite |
 | `assets/smilesafrica/` | Archiv der alten Website: 139 Bilder, 11 Instagram-Bilder, YouTube-Links. Wird nicht ausgeliefert |
+
+## Neuen Blogbeitrag anlegen
+
+Neue Datei `src/content/blog/de/mein-beitrag.md`, Bilder in den Ordner `src/content/blog/de/mein-beitrag/`:
+
+```markdown
+---
+title: "Titel des Beitrags"
+date: 2026-10-11
+author: "Vorname Nachname"
+description: "Ein bis zwei Sätze für die Übersicht und Vorschauen."
+cover: "./mein-beitrag/titelbild.jpg"
+coverAlt: "Was auf dem Bild zu sehen ist"
+---
+
+Text in Markdown …
+
+![Bildbeschreibung](./mein-beitrag/foto.jpg)
+```
+
+Der Dateiname wird zur URL: `/blog/mein-beitrag/`. Mit `draft: true` erscheint ein Beitrag nur lokal. Nach dem Push ist er nach ein paar Minuten online.
+
+Die alten Beitrags-URLs (z. B. `/hurra-wir-duerfen-gratulieren/`) leitet `public/.htaccess` per 301 auf `/blog/…` um.
 
 ## Platzhalter
 

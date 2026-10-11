@@ -1,0 +1,170 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Aurora from '../components/Aurora.astro';
+import { formatDate, getPosts, postLang, postUrl, readingMinutes, type Post } from '../lib/blog';
+import { url } from '../i18n/ui';
+
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+const lang = postLang(post);
+const de = lang === 'de';
+const { Content } = await render(post);
+const { title, date, author, cover, coverAlt, description } = post.data;
+const og = cover ? (await getImage({ src: cover, width: 1200, format: 'jpg' })).src : undefined;
+
+// Vorheriger und nächster Beitrag (chronologisch)
+const all = await getPosts(lang);
+const i = all.findIndex((p) => p.id === post.id);
+const newer = all[i - 1];
+const older = all[i + 1];
+---
+
+<BaseLayout lang={lang} title={title} description={description || undefined} routeKey="blog" alternates={{ [lang]: postUrl(post) }} ogImage={og}>
+  <article>
+    <header class="head">
+      <Aurora intensity={0.7} />
+      <div class="container narrow">
+        <a class="back" href={url('blog', lang)}>← Blog</a>
+        <p class="meta">
+          <time datetime={date.toISOString()}>{formatDate(date, lang)}</time>
+          <span>·</span>
+          <span>{author}</span>
+          <span>·</span>
+          <span>{readingMinutes(post)} {de ? 'Min.' : 'min'}</span>
+        </p>
+        <h1>{title}</h1>
+      </div>
+    </header>
+
+    {
+      cover && (
+        <div class="container cover-wrap">
+          <Image src={cover} alt={coverAlt} widths={[800, 1300, 1800]} sizes="(min-width: 1240px) 1128px, 100vw" class="cover" loading="eager" />
+        </div>
+      )
+    }
+
+    <div class="container narrow body">
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+
+    <nav class="container more" aria-label={de ? 'Weitere Beiträge' : 'More posts'}>
+      {
+        older ? (
+          <a href={postUrl(older)} class="card">
+            <span>← {de ? 'Älter' : 'Older'}</span>
+            <strong>{older.data.title}</strong>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        newer && (
+          <a href={postUrl(newer)} class="card next">
+            <span>{de ? 'Neuer' : 'Newer'} →</span>
+            <strong>{newer.data.title}</strong>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .head {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding-block: clamp(140px, 18vw, 200px) clamp(40px, 6vw, 64px);
+  }
+
+  .head :global(.aurora) {
+    z-index: -1;
+  }
+
+  .back {
+    display: inline-block;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .back:hover {
+    color: var(--accent);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--accent);
+    margin-bottom: 1.2rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5.5vw, 4rem);
+    text-transform: none;
+  }
+
+  .cover-wrap {
+    margin-bottom: clamp(40px, 6vw, 72px);
+  }
+
+  .cover {
+    width: 100%;
+    max-height: 640px;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+
+  .body {
+    padding-bottom: clamp(64px, 9vw, 112px);
+  }
+
+  .more {
+    display: grid;
+    gap: 16px;
+    padding-bottom: clamp(64px, 9vw, 112px);
+  }
+
+  @media (min-width: 800px) {
+    .more {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .more a {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.3s;
+  }
+
+  .more a:hover {
+    border-color: rgb(238 226 6 / 0.5);
+  }
+
+  .more span {
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+
+  .more strong {
+    font-family: var(--display);
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+  }
+
+  .next {
+    text-align: right;
+    align-items: flex-end;
+  }
+</style>

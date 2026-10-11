@@ -246,6 +246,85 @@ p {
   object-fit: cover;
 }
 
+/* Fließtext aus Markdown (Blog) */
+.prose {
+  font-size: 1.02rem;
+  line-height: 1.85;
+  color: rgb(243 243 241 / 0.86);
+}
+
+.prose > * + * {
+  margin-top: 1.3em;
+}
+
+.prose p {
+  margin-bottom: 0;
+}
+
+.prose h2,
+.prose h3 {
+  color: var(--text);
+  text-transform: none;
+  margin: 2.2em 0 0.6em;
+}
+
+.prose h2 {
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+}
+
+.prose h3 {
+  font-size: 1.2rem;
+}
+
+.prose strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.prose a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.prose img {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  margin-block: 0.6em;
+}
+
+.prose a:has(img) {
+  display: block;
+  text-decoration: none;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.3em;
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+.prose blockquote {
+  margin: 1.8em 0;
+  padding: 0.2em 0 0.2em 1.2em;
+  border-left: 3px solid var(--accent);
+  font-family: var(--display);
+  font-size: 1.25rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin-block: 2.5em;
+}
+
 /* Erscheinen beim Scrollen – ohne JS bleibt alles sichtbar */
 .js [data-reveal] {
   opacity: 0;

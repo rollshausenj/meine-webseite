@@ -11,6 +11,7 @@ export const routes = {
   hygiene: { de: '/hygiene/', en: '/en/hygiene/' },
   donate: { de: '/spenden/', en: '/en/donate/' },
   team: { de: '/team/', en: '/en/team/' },
+  blog: { de: '/blog/', en: '/en/blog/' },
   volunteer: { de: '/volunteer/', en: '/en/volunteer/' },
   contact: { de: '/kontakt/', en: '/en/contact/' },
   imprint: { de: '/impressum/', en: '/en/imprint/' },
@@ -21,6 +22,7 @@ export type RouteKey = keyof typeof routes;
 export const nav: { key: RouteKey; label: Record<Lang, string> }[] = [
   { key: 'project', label: { de: 'Projekt', en: 'Project' } },
   { key: 'team', label: { de: 'Team', en: 'Team' } },
+  { key: 'blog', label: { de: 'Blog', en: 'Blog' } },
   { key: 'volunteer', label: { de: 'Volunteer', en: 'Volunteer' } },
   { key: 'contact', label: { de: 'Kontakt', en: 'Contact' } },
 ];

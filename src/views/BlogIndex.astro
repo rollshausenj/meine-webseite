@@ -1,0 +1,226 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StillHero from '../components/StillHero.astro';
+import { formatDate, getPosts, postUrl, readingMinutes } from '../lib/blog';
+import { links, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+// Bisher gibt es nur deutsche Beiträge; die englische Übersicht zeigt sie mit Hinweis.
+const own = await getPosts(lang);
+const fallback = lang === 'en' && own.length === 0;
+const posts = fallback ? await getPosts('de') : own;
+const [featured, ...rest] = posts;
+
+const c = {
+  de: {
+    label: 'Blog',
+    title: 'Aus Korogocho',
+    highlight: '& Mainz.',
+    lead: 'Meilensteine, Geschichten und Einblicke in unsere Arbeit seit 2017. Was gerade passiert, zeigen wir täglich auf Instagram.',
+    latest: 'Neuester Beitrag',
+    archive: 'Alle Beiträge',
+    min: 'Min. Lesezeit',
+    read: 'Lesen',
+  },
+  en: {
+    label: 'Blog',
+    title: 'From Korogocho',
+    highlight: '& Mainz.',
+    lead: 'Milestones, stories and insights into our work since 2017. For daily updates, follow us on Instagram.',
+    latest: 'Latest post',
+    archive: 'All posts',
+    min: 'min read',
+    read: 'Read',
+  },
+}[lang];
+---
+
+<BaseLayout lang={lang} title="Blog" routeKey="blog">
+  <StillHero label={c.label} title={c.title} highlight={c.highlight} lead={c.lead}>
+    <div class="actions">
+      <a class="btn" href={links.instagramDe} rel="noopener">@smilesafricacharity_de ↗</a>
+    </div>
+  </StillHero>
+
+  {
+    fallback && (
+      <div class="container">
+        <p class="note">Our blog posts are currently written in German.</p>
+      </div>
+    )
+  }
+
+  {
+    featured && (
+      <section class="section featured-wrap">
+        <div class="container">
+          <p class="label" data-reveal>{c.latest}</p>
+          <a class="featured" href={postUrl(featured)} lang="de" data-reveal>
+            {featured.data.cover && (
+              <div class="frame">
+                <Image src={featured.data.cover} alt={featured.data.coverAlt} widths={[600, 1000, 1400]} sizes="(min-width: 900px) 55vw, 100vw" loading="eager" />
+              </div>
+            )}
+            <div class="meta">
+              <span class="date">
+                {formatDate(featured.data.date, lang)} · {readingMinutes(featured)} {c.min}
+              </span>
+              <h2>{featured.data.title}</h2>
+              <p>{featured.data.description}</p>
+              <span class="go">{c.read} →</span>
+            </div>
+          </a>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <div class="container">
+      <p class="label" data-reveal>{c.archive}</p>
+      <ul class="posts">
+        {
+          rest.map((post) => (
+            <li data-reveal>
+              <a class="post" href={postUrl(post)} lang="de">
+                <div class="thumb">
+                  {post.data.cover ? (
+                    <Image src={post.data.cover} alt={post.data.coverAlt} widths={[400, 700]} sizes="(min-width: 900px) 33vw, 100vw" />
+                  ) : (
+                    <span aria-hidden="true">✦</span>
+                  )}
+                </div>
+                <span class="date">{formatDate(post.data.date, lang, 'short')}</span>
+                <h3>{post.data.title}</h3>
+                <p>{post.data.description}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .note {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .featured-wrap {
+    padding-top: clamp(32px, 5vw, 64px);
+  }
+
+  .featured {
+    display: grid;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  @media (min-width: 900px) {
+    .featured {
+      grid-template-columns: 1.2fr 1fr;
+    }
+  }
+
+  .featured:hover,
+  .post:hover .thumb {
+    border-color: rgb(238 226 6 / 0.5);
+  }
+
+  .frame img {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .meta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(24px, 4vw, 48px);
+  }
+
+  .meta h2 {
+    font-size: clamp(1.6rem, 3.2vw, 2.6rem);
+    text-transform: none;
+  }
+
+  .meta p {
+    color: var(--muted);
+  }
+
+  .date {
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .go {
+    font-weight: 600;
+    margin-top: 8px;
+  }
+
+  .posts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 48px 24px;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  }
+
+  .post {
+    display: block;
+  }
+
+  .thumb {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 10;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--bg-2);
+    margin-bottom: 16px;
+    color: var(--accent);
+    font-size: 2rem;
+    transition: border-color 0.3s;
+  }
+
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .post h3 {
+    margin-bottom: 0.4em;
+  }
+
+  .post:hover h3 {
+    color: var(--accent);
+  }
+
+  .post p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

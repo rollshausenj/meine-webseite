@@ -3,3 +3,16 @@
 <IfModule mod_headers.c>
   Header set X-Robots-Tag "noindex, nofollow, noarchive"
 </IfModule>
+
+# Alte WordPress-Blog-URLs auf die neuen Blog-Adressen umleiten
+<IfModule mod_alias.c>
+  Redirect 301 /bahati-njema-oh-du-schoene-pruefungszeit/ /blog/bahati-njema-oh-du-schoene-pruefungszeit/
+  Redirect 301 /hurra-wir-duerfen-gratulieren/ /blog/hurra-wir-duerfen-gratulieren/
+  Redirect 301 /lasst-uns-die-weihnachtszeit-einlaeuten/ /blog/lasst-uns-die-weihnachtszeit-einlaeuten/
+  Redirect 301 /n00/ /blog/n00/
+  Redirect 301 /n01/ /blog/n01/
+  Redirect 301 /n02/ /blog/n02/
+  Redirect 301 /n03/ /blog/n03/
+  Redirect 301 /n04/ /blog/n04/
+  Redirect 301 /n05-wissen-wo-es-hingeht/ /blog/n05-wissen-wo-es-hingeht/
+</IfModule>

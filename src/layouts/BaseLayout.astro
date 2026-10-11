@@ -11,12 +11,16 @@ interface Props {
   description?: string;
   /** Schlüssel aus routes – sorgt für hreflang und den Sprachumschalter. */
   routeKey: RouteKey;
+  /** Seiten ohne Gegenstück in der anderen Sprache (Blogbeiträge): nur diese hreflang-Links ausgeben */
+  alternates?: Partial<Record<Lang, string>>;
+  /** Bild für Vorschauen in Messengern und sozialen Netzwerken */
+  ogImage?: string;
 }
 
-const { lang, title, description = t(lang, 'site.description'), routeKey } = Astro.props;
+const { lang, title, description = t(lang, 'site.description'), routeKey, alternates, ogImage } = Astro.props;
 const siteTitle = t(lang, 'site.title');
 const fullTitle = title ? `${title} – ${siteTitle}` : `${siteTitle} – ${t(lang, 'site.claim')}`;
-const alt = routes[routeKey];
+const alt: Partial<Record<Lang, string>> = alternates ?? routes[routeKey];
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
@@ -29,11 +33,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="description" content={description} />
     {!INDEXING && <meta name="robots" content="noindex, nofollow, noarchive" />}
     <link rel="canonical" href={canonical} />
-    {(Object.keys(languages) as Lang[]).map((l) => <link rel="alternate" hreflang={l} href={new URL(alt[l], Astro.site)} />)}
+    {(Object.keys(languages) as Lang[]).filter((l) => alt[l]).map((l) => <link rel="alternate" hreflang={l} href={new URL(alt[l]!, Astro.site)} />)}
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
     <meta property="og:locale" content={lang === 'de' ? 'de_DE' : 'en_GB'} />
     <meta name="theme-color" content="#0b0b0c" />
     <script is:inline>document.documentElement.classList.add('js');</script>
